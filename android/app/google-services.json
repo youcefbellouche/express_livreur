@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "1061121456734",
+    "project_id": "shopping-express-9b014",
+    "storage_bucket": "shopping-express-9b014.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061121456734:android:ce179b77ebaa717f7792cf",
+        "android_client_info": {
+          "package_name": "com.example.express"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1061121456734-lmvgc3rdqrnagdeh7vg9si9vdj3lkpvv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPfk7rMrxqxSr-m5g1Zs93Q2PS145izOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1061121456734-lmvgc3rdqrnagdeh7vg9si9vdj3lkpvv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1061121456734-7rnudfsh1pd6e46c1ps5nnd1ca0ud5m3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expresss"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1061121456734:android:6ced8156e715b58d7792cf",
+        "android_client_info": {
+          "package_name": "com.example.express_livreur"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1061121456734-lmvgc3rdqrnagdeh7vg9si9vdj3lkpvv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPfk7rMrxqxSr-m5g1Zs93Q2PS145izOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1061121456734-lmvgc3rdqrnagdeh7vg9si9vdj3lkpvv.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1061121456734-7rnudfsh1pd6e46c1ps5nnd1ca0ud5m3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.expresss"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
