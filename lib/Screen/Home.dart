@@ -1,10 +1,13 @@
 // ignore_for_file: file_names
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:express_livreur/ApiFirebase.dart';
 import 'package:express_livreur/Model/Filter.dart';
 import 'package:express_livreur/Model/Filter.dart';
 import 'package:express_livreur/Model/Order.dart';
+import 'package:express_livreur/Widget/Drawer.dart';
 import 'package:express_livreur/Widget/OrderCard.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -19,8 +22,19 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     scrollController.addListener(_scrollListener);
-
+    saveToken();
     fetchData();
+  }
+
+  saveToken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    print(token);
+    await FirebaseFirestore.instance
+        .collection('Tokens')
+        .doc("livreur")
+        .update({
+      "tokens": FieldValue.arrayUnion([token])
+    });
   }
 
   TextEditingController idController = TextEditingController();
@@ -72,6 +86,7 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: drawer(context),
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: const Text('Shoping express'),
@@ -116,7 +131,7 @@ class _HomeState extends State<Home> {
                             idController.clear();
                           });
                         },
-                        icon: Icon(Icons.tune),
+                        icon: const Icon(Icons.tune),
                         itemBuilder: (BuildContext context) {
                           return _sortByOptions.map((item) {
                             return PopupMenuItem<Filter>(
@@ -134,10 +149,11 @@ class _HomeState extends State<Home> {
                     : ListView.builder(
                         controller: scrollController,
                         scrollDirection: Axis.vertical,
-                        physics: const AlwaysScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: data.length,
                         itemBuilder: (context, index) {
+                          print(index);
                           return OrderCard(
                             data: data[index],
                           );

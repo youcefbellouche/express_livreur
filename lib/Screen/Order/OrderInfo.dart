@@ -136,61 +136,65 @@ class _OrderInfoState extends State<OrderInfo> {
                       ],
                     ),
                   ),
-                  SliverPadding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    sliver: SliverToBoxAdapter(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Abutton(
-                            size: const Size(150, 50),
-                            onpressed: () async {
-                              setState(() {
-                                loading = true;
-                              });
-                              await apiFirebase.updateOrder(
-                                  statut: 'Annuler',
-                                  id: widget.order.id.toString());
+                  (widget.order.status == 'en attente' ||
+                          widget.order.status == 'en livraison')
+                      ? SliverPadding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          sliver: SliverToBoxAdapter(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Abutton(
+                                  size: const Size(150, 50),
+                                  onpressed: () async {
+                                    setState(() {
+                                      loading = true;
+                                    });
+                                    // await apiFirebase.updateOrder(
+                                    //     statut: 'annuler',
+                                    //     id: widget.order.id.toString());
 
-                              setState(() {
-                                loading = false;
-                              });
-                            },
-                            child: const Text('Annuler'),
-                            colors: Colors.redAccent,
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                  },
+                                  child: const Text('Annuler'),
+                                  colors: Colors.redAccent,
+                                ),
+                                Abutton(
+                                  size: const Size(150, 50),
+                                  onpressed: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      setState(() {
+                                        loading = true;
+                                        widget.order.totalRammaser =
+                                            totalRController.value.text;
+                                        widget.order.note =
+                                            noteController.value.text;
+                                        widget.order.status == "en attente"
+                                            ? widget.order.status =
+                                                'en livraison'
+                                            : widget.order.status = 'livré';
+                                      });
+
+                                      await valideOrder();
+
+                                      setState(() {
+                                        loading = false;
+                                      });
+                                    }
+                                  },
+                                  child: widget.order.status == "en attente"
+                                      ? const Text('En livraison')
+                                      : const Text('Livré'),
+                                  colors: Colors.green,
+                                ),
+                              ],
+                            ),
                           ),
-                          Abutton(
-                            size: const Size(150, 50),
-                            onpressed: () async {
-                              if (formKey.currentState!.validate()) {
-                                setState(() {
-                                  loading = true;
-                                  widget.order.totalRammaser =
-                                      totalRController.value.text;
-                                  widget.order.note = noteController.value.text;
-                                  widget.order.status == "en attente"
-                                      ? widget.order.status = 'en livraison'
-                                      : widget.order.status = 'livré';
-                                });
-
-                                await Future.wait(
-                                    [valideOrder(), addFirebase(), addStock()]);
-
-                                setState(() {
-                                  loading = false;
-                                });
-                              }
-                            },
-                            child: widget.order.status == "en attente"
-                                ? const Text('En livraison')
-                                : const Text('Livré'),
-                            colors: Colors.green,
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                        )
+                      : Container()
                 ],
               ),
             ),
@@ -198,30 +202,7 @@ class _OrderInfoState extends State<OrderInfo> {
   }
 
   Future valideOrder() async {
-    if (widget.order.status == "en attente") {
-      await apiFirebase.updateOrder(
-          statut: 'processing', id: widget.order.id.toString());
-    }
-    if (widget.order.status == "processing") {
-      await apiFirebase.updateOrder(
-          statut: 'Livrer', id: widget.order.id.toString());
-    }
-  }
-
-  Future addFirebase() async {
-    await FirebaseFirestore.instance
-        .collection('Orders')
-        .doc(widget.order.id.toString())
-        .set(widget.order.toJson());
-  }
-
-  Future addStock() async {
-    await FirebaseFirestore.instance
-        .collection('Products')
-        .doc(widget.order.product!.id.toString())
-        .update({
-      'enCours': FieldValue.increment(
-          num.parse(widget.order.product!.quantity.toString()))
-    });
+    await apiFirebase.updateOrder(
+        status: widget.order.status!, id: widget.order.id.toString());
   }
 }

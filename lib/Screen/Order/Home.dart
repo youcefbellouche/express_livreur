@@ -15,7 +15,7 @@ class Home extends StatelessWidget {
     return GetBuilder<HomeController>(
         init: HomeController(),
         builder: (c) => Scaffold(
-              drawer: drawer(),
+              drawer: drawer(context),
               backgroundColor: Colors.grey.shade100,
               appBar: AppBar(
                 title: const Text('Shoping express'),

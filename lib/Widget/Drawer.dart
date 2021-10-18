@@ -3,14 +3,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
-Drawer drawer() {
+Drawer drawer(context) {
   return Drawer(
     child: ListView(
       children: [
-        const DrawerHeader(child: Text('drawer')),
+        const DrawerHeader(child: Text('Options')),
+        DrawerItem(title: 'Acceuil', func: () => Get.offNamed('/')),
         DrawerItem(
-          title: 'Acceuil',
-          func: () => Get.offNamed('/'),
+          title: 'Statistiques',
+          func: () {
+            Get.offNamed('Stats');
+          },
         ),
       ],
     ),
@@ -31,12 +34,15 @@ class DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-        tileColor: const Color(0x000ffeee),
-        title: Text(
-          title,
-          style: const TextStyle(fontSize: 25),
-        ),
-        onTap: func);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+      child: ListTile(
+          tileColor: Colors.blueGrey.withOpacity(0.4),
+          title: Text(
+            title,
+            style: const TextStyle(fontSize: 25),
+          ),
+          onTap: func),
+    );
   }
 }
