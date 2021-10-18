@@ -30,7 +30,7 @@ class OrderCard extends StatelessWidget {
               )),
           padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.all(12),
-          height: 145,
+          height: 150,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -85,6 +85,19 @@ class OrderCard extends StatelessWidget {
                   ),
                   SelectableText(
                     data.product!.quantity.toString(),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+              Row(
+                children: [
+                  const Text(
+                    'Statut : ',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SelectableText(
+                    data.status.toString(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   )

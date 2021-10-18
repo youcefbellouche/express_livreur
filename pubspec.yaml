@@ -39,6 +39,7 @@ dependencies:
   get: ^4.3.8
   url_launcher: ^6.0.12
   firebase_messaging: ^10.0.8
+  syncfusion_flutter_datepicker: ^19.2.56
 
 dev_dependencies:
   flutter_test:

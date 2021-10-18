@@ -41,21 +41,30 @@ class APIFirebase {
     await FirebaseFirestore.instance
         .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
-        .update({"annuler": FieldValue.increment(1)});
+        .set({
+      "annuler": FieldValue.increment(1),
+      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
+    }, SetOptions(merge: true));
   }
 
   Future livrer(DateTime time) async {
     await FirebaseFirestore.instance
         .collection('Stat')
         .doc('${time.year}-${time.month}-${time.day}')
-        .update({"livrer": FieldValue.increment(1)});
+        .set({
+      "livrer": FieldValue.increment(1),
+      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
+    }, SetOptions(merge: true));
   }
 
   Future enLivraison(DateTime time) async {
     await FirebaseFirestore.instance
         .collection('Stat')
         .doc('${time.year}-${time.month}-${time.day}')
-        .update({"en livraison": FieldValue.increment(1)});
+        .set({
+      "en livraison": FieldValue.increment(1),
+      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
+    }, SetOptions(merge: true));
   }
 
   Future<List<Order>> getOrdersById({int? id}) async {
@@ -79,15 +88,15 @@ class APIFirebase {
     return data;
   }
 
-  Future<List<Order>> getOrders({String? status}) async {
+  Future<List<Order>> getOrders(
+      {String? status, required DateTime time}) async {
     List<Order> data = [];
-
     try {
       if (status != null && status != "all") {
-        print(status);
         await FirebaseFirestore.instance
             .collection('Orders')
             .where("status", isEqualTo: status.toLowerCase())
+            .where('time', isEqualTo: time.millisecondsSinceEpoch)
             .get()
             .then((value) {
           for (var element in value.docs) {
@@ -95,9 +104,9 @@ class APIFirebase {
           }
         });
       } else {
-        print(2);
         await FirebaseFirestore.instance
             .collection('Orders')
+            .where('time', isEqualTo: time.millisecondsSinceEpoch)
             .get()
             .then((value) {
           for (var element in value.docs) {
@@ -113,12 +122,16 @@ class APIFirebase {
     return data;
   }
 
-  Future updateOrder({required String status, required String id}) async {
+  Future updateOrder({
+    required String status,
+    required String id,
+  }) async {
     try {
       await FirebaseFirestore.instance
           .collection('Orders')
           .doc(id)
           .update({"status": status});
+
       if (status == 'en livraison') {
         await enLivraison(DateTime.now());
       }

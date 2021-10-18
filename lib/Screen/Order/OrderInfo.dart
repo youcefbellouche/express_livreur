@@ -63,7 +63,6 @@ class _OrderInfoState extends State<OrderInfo> {
                         ),
                         CustomField(
                           onTap: () async {
-                            print("test");
                             await _makePhoneCall(
                                 "tel:${widget.order.user!.phone}");
                           },
@@ -71,14 +70,6 @@ class _OrderInfoState extends State<OrderInfo> {
                           read: true,
                           textInputType: TextInputType.phone,
                           value: widget.order.user!.phone,
-                        ),
-                        CustomField(
-                          label: 'Status',
-                          read: true,
-                          value: widget.order.status,
-                          onChanged: (input) {
-                            widget.order.status = input;
-                          },
                         ),
                         CustomField(
                           label: 'Wilaya',
@@ -96,14 +87,25 @@ class _OrderInfoState extends State<OrderInfo> {
                           value: widget.order.user!.address,
                         ),
                         CustomField(
+                          label: 'Status',
+                          read: true,
+                          value: widget.order.status,
+                          onChanged: (input) {
+                            widget.order.status = input;
+                          },
+                        ),
+                        CustomField(
                           label: 'Produit',
                           read: true,
                           value: widget.order.product!.name,
                         ),
                         CustomField(
-                          label: 'Prix du produit',
-                          read: true,
-                          value: widget.order.product!.priceU.toString(),
+                          label: 'Quantité',
+                          read: false,
+                          onChanged: (input) {
+                            widget.order.product!.quantity = int.parse(input);
+                          },
+                          value: widget.order.product!.quantity.toString(),
                         ),
                         CustomField(
                           label: 'Quantité',
@@ -116,28 +118,40 @@ class _OrderInfoState extends State<OrderInfo> {
                         CustomField(
                           label: 'Note',
                           read: false,
-                          onChanged: (input) {
-                            widget.order.note = input;
-                          },
+                          value: widget.order.note,
                         ),
                         CustomField(
                           label: 'Total a ramasser',
                           read: false,
-                          textInputType: TextInputType.number,
-                          validator: (input) {
-                            if (input!.isEmpty) {
-                              return "Donner le total a rammaser";
-                            }
-
-                            return null;
-                          },
-                          controller: totalRController,
+                          value: widget.order.totalRammaser,
                         ),
                       ],
                     ),
                   ),
-                  (widget.order.status == 'en attente' ||
-                          widget.order.status == 'en livraison')
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        return Column(
+                          children: [
+                            CustomField(
+                              label: 'Couleur',
+                              read: false,
+                              value: widget.order.variable![index]['color'],
+                            ),
+                            CustomField(
+                              label: 'qte',
+                              read: false,
+                              value: widget.order.variable![index]['qte']
+                                  .toString(),
+                            ),
+                          ],
+                        );
+                      },
+                      childCount: widget.order.variable!.length,
+                    ),
+                  ),
+                  widget.order.status == 'en attente' ||
+                          widget.order.status == 'en livraison'
                       ? SliverPadding(
                           padding: const EdgeInsets.only(bottom: 24),
                           sliver: SliverToBoxAdapter(
@@ -148,12 +162,21 @@ class _OrderInfoState extends State<OrderInfo> {
                                 Abutton(
                                   size: const Size(150, 50),
                                   onpressed: () async {
+                                    bool liv =
+                                        widget.order.status == 'en attente'
+                                            ? false
+                                            : true;
                                     setState(() {
                                       loading = true;
+
+                                      widget.order.status = "annuler";
                                     });
-                                    // await apiFirebase.updateOrder(
-                                    //     statut: 'annuler',
-                                    //     id: widget.order.id.toString());
+                                    await apiFirebase.updateOrder(
+                                        status: widget.order.status!,
+                                        id: widget.order.id.toString());
+                                    liv
+                                        ? annulerStockafterLivraison()
+                                        : annulerStockafterAttente();
 
                                     setState(() {
                                       loading = false;
@@ -194,7 +217,7 @@ class _OrderInfoState extends State<OrderInfo> {
                             ),
                           ),
                         )
-                      : Container()
+                      : SliverToBoxAdapter(child: Container())
                 ],
               ),
             ),
@@ -203,6 +226,120 @@ class _OrderInfoState extends State<OrderInfo> {
 
   Future valideOrder() async {
     await apiFirebase.updateOrder(
-        status: widget.order.status!, id: widget.order.id.toString());
+      status: widget.order.status!,
+      id: widget.order.id.toString(),
+    );
+    if (widget.order.status == 'en livraison') {
+      await livraisonStock();
+    }
+    if (widget.order.status == 'livré') {
+      await liverStock();
+    }
+  }
+
+  Future liverStock() async {
+    Map<String, dynamic> data = {
+      'enLivraison': FieldValue.increment(
+          -1 * int.parse(widget.order.product!.quantity.toString())),
+      'qte': FieldValue.increment(
+          -1 * int.parse(widget.order.product!.quantity.toString())),
+    };
+    Map<String, dynamic> temp = {};
+    if (widget.order.variable != null) {
+      for (var element in widget.order.variable!) {
+        data.addAll({
+          'enLivraison-${element['color']}':
+              FieldValue.increment(-1 * num.parse(element['qte'].toString())),
+          'Livrer-${element['color']}':
+              FieldValue.increment(num.parse(element['qte'].toString())),
+        });
+        temp.addAll({
+          element['color']:
+              FieldValue.increment(-1 * num.parse(element['qte'].toString())),
+        });
+      }
+      data.addAll({'couleur': temp});
+    }
+    FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.order.product!.id.toString())
+        .set(
+          data,
+          SetOptions(merge: true),
+        );
+  }
+
+  Future annulerStockafterLivraison() async {
+    Map<String, dynamic> data = {
+      'annuler': FieldValue.increment(
+          int.parse(widget.order.product!.quantity.toString())),
+      'enLivraison': FieldValue.increment(
+          -1 * int.parse(widget.order.product!.quantity.toString())),
+    };
+    if (widget.order.variable != null) {
+      for (var element in widget.order.variable!) {
+        data.addAll({
+          'enLivraison-${element['color']}':
+              FieldValue.increment(-1 * num.parse(element['qte'].toString())),
+          'Annuler-${element['color']}':
+              FieldValue.increment(num.parse(element['qte'].toString())),
+        });
+      }
+    }
+    FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.order.product!.id.toString())
+        .set(
+          data,
+          SetOptions(merge: true),
+        );
+  }
+
+  Future annulerStockafterAttente() async {
+    Map<String, dynamic> data = {
+      'annuler': FieldValue.increment(
+          int.parse(widget.order.product!.quantity.toString())),
+      'encours': FieldValue.increment(
+          -1 * int.parse(widget.order.product!.quantity.toString())),
+    };
+    if (widget.order.variable != null) {
+      for (var element in widget.order.variable!) {
+        data.addAll({
+          'Annuler-${element['color']}':
+              FieldValue.increment(num.parse(element['qte'].toString())),
+        });
+      }
+    }
+    FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.order.product!.id.toString())
+        .set(
+          data,
+          SetOptions(merge: true),
+        );
+  }
+
+  Future livraisonStock() async {
+    Map<String, dynamic> data = {
+      'encours': FieldValue.increment(
+          -1 * int.parse(widget.order.product!.quantity.toString())),
+      'enLivraison': FieldValue.increment(
+          int.parse(widget.order.product!.quantity.toString())),
+    };
+    if (widget.order.variable != null) {
+      for (var element in widget.order.variable!) {
+        data.addAll({
+          'enLivraison-${element['color']}':
+              FieldValue.increment(num.parse(element['qte'].toString())),
+        });
+      }
+    }
+    FirebaseFirestore.instance
+        .collection('Products')
+        .doc(widget.order.product!.id.toString())
+        .set(
+          data,
+          SetOptions(merge: true),
+        );
   }
 }

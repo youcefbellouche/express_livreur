@@ -1,3 +1,4 @@
+// ignore_for_file: file_names
 class Filter {
   String value;
   String text;

@@ -3,8 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 
-import 'Screen/Home.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -21,7 +19,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       getPages: routes,
       title: 'Shopping express',
-      home: Home(),
     );
   }
 }
