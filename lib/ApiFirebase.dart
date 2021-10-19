@@ -49,7 +49,7 @@ class APIFirebase {
 
   Future livrer(DateTime time) async {
     await FirebaseFirestore.instance
-        .collection('Stat')
+        .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "livrer": FieldValue.increment(1),
@@ -59,7 +59,7 @@ class APIFirebase {
 
   Future enLivraison(DateTime time) async {
     await FirebaseFirestore.instance
-        .collection('Stat')
+        .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "en livraison": FieldValue.increment(1),
@@ -118,7 +118,6 @@ class APIFirebase {
       // ignore: avoid_print
       print("youcef ${e.message}");
     }
-
     return data;
   }
 

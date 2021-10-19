@@ -108,14 +108,6 @@ class _OrderInfoState extends State<OrderInfo> {
                           value: widget.order.product!.quantity.toString(),
                         ),
                         CustomField(
-                          label: 'Quantité',
-                          read: false,
-                          onChanged: (input) {
-                            widget.order.product!.quantity = int.parse(input);
-                          },
-                          value: widget.order.product!.quantity.toString(),
-                        ),
-                        CustomField(
                           label: 'Note',
                           read: false,
                           value: widget.order.note,
@@ -150,7 +142,7 @@ class _OrderInfoState extends State<OrderInfo> {
                       childCount: widget.order.variable!.length,
                     ),
                   ),
-                  widget.order.status == 'en attente' ||
+                  widget.order.status == 'En attente' ||
                           widget.order.status == 'en livraison'
                       ? SliverPadding(
                           padding: const EdgeInsets.only(bottom: 24),
@@ -163,7 +155,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                   size: const Size(150, 50),
                                   onpressed: () async {
                                     bool liv =
-                                        widget.order.status == 'en attente'
+                                        widget.order.status == 'En attente'
                                             ? false
                                             : true;
                                     setState(() {
@@ -195,7 +187,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                             totalRController.value.text;
                                         widget.order.note =
                                             noteController.value.text;
-                                        widget.order.status == "en attente"
+                                        widget.order.status == "En attente"
                                             ? widget.order.status =
                                                 'en livraison'
                                             : widget.order.status = 'livré';
@@ -208,7 +200,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                       });
                                     }
                                   },
-                                  child: widget.order.status == "en attente"
+                                  child: widget.order.status == "En attente"
                                       ? const Text('En livraison')
                                       : const Text('Livré'),
                                   colors: Colors.green,
@@ -307,6 +299,8 @@ class _OrderInfoState extends State<OrderInfo> {
         data.addAll({
           'Annuler-${element['color']}':
               FieldValue.increment(num.parse(element['qte'].toString())),
+          'encours-${element['color']}':
+              FieldValue.increment(-1 * num.parse(element['qte'].toString())),
         });
       }
     }
@@ -331,6 +325,8 @@ class _OrderInfoState extends State<OrderInfo> {
         data.addAll({
           'enLivraison-${element['color']}':
               FieldValue.increment(num.parse(element['qte'].toString())),
+          'encours-${element['color']}':
+              FieldValue.increment(-1 * num.parse(element['qte'].toString())),
         });
       }
     }

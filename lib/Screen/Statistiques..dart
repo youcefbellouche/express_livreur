@@ -44,7 +44,7 @@ class _StatistiquesState extends State<Statistiques> {
                     if (dateTime!.startDate != null &&
                         dateTime!.endDate != null) {
                       await FirebaseFirestore.instance
-                          .collection('Stat')
+                          .collection('Stats')
                           .where('time',
                               isGreaterThanOrEqualTo:
                                   dateTime!.startDate!.millisecondsSinceEpoch)
