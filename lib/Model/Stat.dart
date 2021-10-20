@@ -2,9 +2,29 @@
 
 class Stat {
   int? enLivraison;
-  Stat({this.enLivraison});
+  int? annuler;
+  int? livrer;
+  int? time;
+  int? total;
+  Stat({this.enLivraison, this.annuler, this.livrer, this.time, this.total});
 
   Stat.fromJson(Map<String, dynamic> json) {
-    enLivraison = json['en livraison'];
+    if (json['en livraison'] != null) {
+      enLivraison = json['en livraison'];
+    }
+
+    if (json['annuler'] != null) {
+      annuler = json['annuler'];
+    }
+
+    time = json['time'];
+
+    if (json['livrer'] != null) {
+      livrer = json['livrer'];
+    }
+
+    if (json["total"] != null) {
+      total = json["total"];
+    }
   }
 }

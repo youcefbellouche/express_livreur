@@ -47,12 +47,13 @@ class APIFirebase {
     }, SetOptions(merge: true));
   }
 
-  Future livrer(DateTime time) async {
+  Future livrer(DateTime time, double total) async {
     await FirebaseFirestore.instance
         .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "livrer": FieldValue.increment(1),
+      "total": FieldValue.increment(total),
       'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
     }, SetOptions(merge: true));
   }
@@ -121,10 +122,8 @@ class APIFirebase {
     return data;
   }
 
-  Future updateOrder({
-    required String status,
-    required String id,
-  }) async {
+  Future updateOrder(
+      {required String status, required String id, double? total}) async {
     try {
       await FirebaseFirestore.instance
           .collection('Orders')
@@ -135,7 +134,7 @@ class APIFirebase {
         await enLivraison(DateTime.now());
       }
       if (status == 'livré') {
-        await livrer(DateTime.now());
+        await livrer(DateTime.now(), total!);
       }
       if (status == 'annuler') {
         await annuler(DateTime.now());

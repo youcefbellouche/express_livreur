@@ -16,6 +16,10 @@ class _StatistiquesState extends State<Statistiques> {
   PickerDateRange? dateTime;
   DateRangePickerController dateController = DateRangePickerController();
   Stat? stat;
+  int livrer = 0;
+  int enLivraison = 0;
+  int annuler = 0;
+  int total = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -50,15 +54,37 @@ class _StatistiquesState extends State<Statistiques> {
                                   dateTime!.startDate!.millisecondsSinceEpoch)
                           .where('time',
                               isLessThanOrEqualTo:
-                                  dateTime!.endDate!.millisecondsSinceEpoch)
+                                  dateTime!.endDate!.millisecondsSinceEpoch +
+                                      86399999)
                           .get()
                           .then((value) {
                         // ignore: avoid_print
-                        print(value.docs.length);
+                        livrer = 0;
+                        enLivraison = 0;
+                        annuler = 0;
+                        total = 0;
                         for (var element in value.docs) {
                           Stat tempStat = Stat.fromJson(element.data());
-                          stat?.enLivraison = tempStat.enLivraison;
+                          if (tempStat.livrer != null) {
+                            livrer += tempStat.livrer!;
+                          }
+                          if (tempStat.enLivraison != null) {
+                            enLivraison += tempStat.enLivraison!;
+                          }
+                          if (tempStat.annuler != null) {
+                            annuler += tempStat.annuler!;
+                          }
+                          if (tempStat.total != null) {
+                            total += tempStat.total!;
+                          }
                         }
+                        dateTime = null;
+                        setState(() {
+                          livrer = livrer;
+                          enLivraison = enLivraison;
+                          annuler = annuler;
+                          total = total;
+                        });
                       });
                     }
                   },
@@ -70,6 +96,76 @@ class _StatistiquesState extends State<Statistiques> {
                   view: DateRangePickerView.month,
                 )),
           ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.blue,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(13),
+                )),
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
+            child: Text(
+              "Livrer  : $livrer",
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.blue,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(13),
+                )),
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
+            child: Text("Annuler  : $annuler",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.blue,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(13),
+                )),
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
+            child: Text("En livraison  : $enLivraison",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 3),
+                color: Colors.blue,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(13),
+                )),
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            padding: const EdgeInsets.all(5),
+            margin: const EdgeInsets.all(5),
+            child: Text("Total  : $total",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                )),
+          )
         ],
       ),
     );

@@ -160,7 +160,6 @@ class _OrderInfoState extends State<OrderInfo> {
                                             : true;
                                     setState(() {
                                       loading = true;
-
                                       widget.order.status = "annuler";
                                     });
                                     await apiFirebase.updateOrder(
@@ -169,7 +168,15 @@ class _OrderInfoState extends State<OrderInfo> {
                                     liv
                                         ? annulerStockafterLivraison()
                                         : annulerStockafterAttente();
-
+                                    await FirebaseFirestore.instance
+                                        .collection("Tokens")
+                                        .doc('admin')
+                                        .get()
+                                        .then((value) async {
+                                      await apiFirebase.sendMessage(
+                                          value.data()!["tokens"],
+                                          "Votre commande ${widget.order.id} est ${widget.order.status} ");
+                                    });
                                     setState(() {
                                       loading = false;
                                     });
@@ -218,15 +225,23 @@ class _OrderInfoState extends State<OrderInfo> {
 
   Future valideOrder() async {
     await apiFirebase.updateOrder(
-      status: widget.order.status!,
-      id: widget.order.id.toString(),
-    );
+        status: widget.order.status!,
+        id: widget.order.id.toString(),
+        total: double.parse(widget.order.totalRammaser!));
     if (widget.order.status == 'en livraison') {
       await livraisonStock();
     }
     if (widget.order.status == 'livré') {
       await liverStock();
     }
+    await FirebaseFirestore.instance
+        .collection("Tokens")
+        .doc('admin')
+        .get()
+        .then((value) async {
+      await apiFirebase.sendMessage(value.data()!["tokens"],
+          "Votre commande ${widget.order.id} est ${widget.order.status} ");
+    });
   }
 
   Future liverStock() async {
