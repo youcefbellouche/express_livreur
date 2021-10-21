@@ -37,34 +37,38 @@ class APIFirebase {
     );
   }
 
-  Future annuler(DateTime time) async {
+  Future annuler(DateTime time, double coutAnnuler) async {
     await FirebaseFirestore.instance
         .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "annuler": FieldValue.increment(1),
-      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
+      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch,
+      'coutAnnuler': FieldValue.increment(coutAnnuler),
     }, SetOptions(merge: true));
   }
 
-  Future livrer(DateTime time, double total) async {
+  Future livrer(DateTime time, double total, double coutLivraison) async {
     await FirebaseFirestore.instance
         .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "livrer": FieldValue.increment(1),
       "total": FieldValue.increment(total),
+      'coutLivraison': FieldValue.increment(coutLivraison),
       'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
     }, SetOptions(merge: true));
   }
 
-  Future enLivraison(DateTime time) async {
+  Future enLivraison(
+    DateTime time,
+  ) async {
     await FirebaseFirestore.instance
         .collection('Stats')
         .doc('${time.year}-${time.month}-${time.day}')
         .set({
       "en livraison": FieldValue.increment(1),
-      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch
+      'time': DateTime(time.year, time.month, time.day).millisecondsSinceEpoch,
     }, SetOptions(merge: true));
   }
 
@@ -123,21 +127,36 @@ class APIFirebase {
   }
 
   Future updateOrder(
-      {required String status, required String id, double? total}) async {
+      {required String status,
+      required String id,
+      double? total,
+      double? coutLivraison,
+      double? coutAnnuler}) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('Orders')
-          .doc(id)
-          .update({"status": status});
-
       if (status == 'en livraison') {
-        await enLivraison(DateTime.now());
+        await FirebaseFirestore.instance.collection('Orders').doc(id).update({
+          "status": status,
+          'dateEnlivraison': DateTime.now().millisecondsSinceEpoch
+        });
+        await enLivraison(
+          DateTime.now(),
+        );
       }
       if (status == 'livré') {
-        await livrer(DateTime.now(), total!);
+        await FirebaseFirestore.instance.collection('Orders').doc(id).update({
+          "status": status,
+          'coutLivraison': coutLivraison,
+          'dateLivrer': DateTime.now().millisecondsSinceEpoch
+        });
+        await livrer(DateTime.now(), total!, coutLivraison!);
       }
       if (status == 'annuler') {
-        await annuler(DateTime.now());
+        await FirebaseFirestore.instance.collection('Orders').doc(id).update({
+          "status": status,
+          'coutAnnuler': coutAnnuler,
+          'dateAnnuler': DateTime.now().millisecondsSinceEpoch
+        });
+        await annuler(DateTime.now(), coutAnnuler!);
       }
     } on DioError catch (e) {
       // ignore: avoid_print

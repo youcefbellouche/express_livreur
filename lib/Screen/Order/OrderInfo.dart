@@ -23,8 +23,9 @@ class _OrderInfoState extends State<OrderInfo> {
 
   bool loading = false;
   final formKey = GlobalKey<FormState>();
-  TextEditingController totalRController = TextEditingController();
   TextEditingController noteController = TextEditingController();
+  TextEditingController coutLivraison = TextEditingController();
+  TextEditingController coutAnnuler = TextEditingController();
 
   @override
   void initState() {
@@ -101,7 +102,7 @@ class _OrderInfoState extends State<OrderInfo> {
                         ),
                         CustomField(
                           label: 'Quantité',
-                          read: false,
+                          read: true,
                           onChanged: (input) {
                             widget.order.product!.quantity = int.parse(input);
                           },
@@ -109,14 +110,28 @@ class _OrderInfoState extends State<OrderInfo> {
                         ),
                         CustomField(
                           label: 'Note',
-                          read: false,
+                          read: true,
                           value: widget.order.note,
                         ),
                         CustomField(
                           label: 'Total a ramasser',
-                          read: false,
+                          read: true,
                           value: widget.order.totalRammaser,
                         ),
+                        widget.order.coutLivraison != null
+                            ? CustomField(
+                                label: 'Cout total de la livraison',
+                                read: true,
+                                value: widget.order.coutLivraison.toString(),
+                              )
+                            : Container(),
+                        widget.order.coutAnnuler != null
+                            ? CustomField(
+                                label: 'Cout total de retour',
+                                read: true,
+                                value: widget.order.coutAnnuler.toString(),
+                              )
+                            : Container(),
                       ],
                     ),
                   ),
@@ -127,12 +142,12 @@ class _OrderInfoState extends State<OrderInfo> {
                           children: [
                             CustomField(
                               label: 'Couleur',
-                              read: false,
+                              read: true,
                               value: widget.order.variable![index]['color'],
                             ),
                             CustomField(
                               label: 'qte',
-                              read: false,
+                              read: true,
                               value: widget.order.variable![index]['qte']
                                   .toString(),
                             ),
@@ -141,6 +156,26 @@ class _OrderInfoState extends State<OrderInfo> {
                       },
                       childCount: widget.order.variable!.length,
                     ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: widget.order.status == 'en livraison'
+                        ? CustomField(
+                            label: 'Cout total de la livraison',
+                            read: false,
+                            controller: coutLivraison,
+                            textInputType: TextInputType.number,
+                          )
+                        : Container(),
+                  ),
+                  SliverToBoxAdapter(
+                    child: widget.order.status == 'en livraison'
+                        ? CustomField(
+                            label: 'Cout du retour',
+                            read: false,
+                            controller: coutAnnuler,
+                            textInputType: TextInputType.number,
+                          )
+                        : Container(),
                   ),
                   widget.order.status == 'En attente' ||
                           widget.order.status == 'en livraison'
@@ -162,9 +197,15 @@ class _OrderInfoState extends State<OrderInfo> {
                                       loading = true;
                                       widget.order.status = "annuler";
                                     });
+
                                     await apiFirebase.updateOrder(
                                         status: widget.order.status!,
-                                        id: widget.order.id.toString());
+                                        total: double.parse(
+                                            widget.order.totalRammaser!),
+                                        id: widget.order.id.toString(),
+                                        coutAnnuler:
+                                            double.parse(coutAnnuler.text));
+
                                     liv
                                         ? annulerStockafterLivraison()
                                         : annulerStockafterAttente();
@@ -190,8 +231,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                     if (formKey.currentState!.validate()) {
                                       setState(() {
                                         loading = true;
-                                        widget.order.totalRammaser =
-                                            totalRController.value.text;
+
                                         widget.order.note =
                                             noteController.value.text;
                                         widget.order.status == "En attente"
@@ -224,14 +264,20 @@ class _OrderInfoState extends State<OrderInfo> {
   }
 
   Future valideOrder() async {
-    await apiFirebase.updateOrder(
+    if (widget.order.status == 'en livraison') {
+      await apiFirebase.updateOrder(
         status: widget.order.status!,
         id: widget.order.id.toString(),
-        total: double.parse(widget.order.totalRammaser!));
-    if (widget.order.status == 'en livraison') {
+        total: double.parse(widget.order.totalRammaser!),
+      );
       await livraisonStock();
     }
     if (widget.order.status == 'livré') {
+      await apiFirebase.updateOrder(
+          status: widget.order.status!,
+          id: widget.order.id.toString(),
+          total: double.parse(widget.order.totalRammaser!),
+          coutLivraison: double.parse(coutLivraison.text));
       await liverStock();
     }
     await FirebaseFirestore.instance

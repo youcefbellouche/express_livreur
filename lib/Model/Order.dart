@@ -16,6 +16,8 @@ class Order {
   String? note;
   String? status;
   String? total;
+  double? coutLivraison;
+  double? coutAnnuler;
 
   Order(
       {this.price,
@@ -28,6 +30,8 @@ class Order {
       this.note,
       this.variable,
       this.total,
+      this.coutLivraison,
+      this.coutAnnuler,
       this.status});
 
   Order.fromJson(Map<String, dynamic> json) {
@@ -42,6 +46,8 @@ class Order {
     status = json['status'];
     note = json['note'];
     total = json['total'];
+    coutLivraison = json['coutLivraison'];
+    coutAnnuler = json['coutAnnuler'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};
