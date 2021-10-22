@@ -25,7 +25,7 @@ class _OrderInfoState extends State<OrderInfo> {
   final formKey = GlobalKey<FormState>();
   TextEditingController noteController = TextEditingController();
   TextEditingController coutLivraison = TextEditingController();
-  TextEditingController coutAnnuler = TextEditingController();
+  TextEditingController coutAnnuler = TextEditingController(text: '0');
 
   @override
   void initState() {
