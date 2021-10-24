@@ -30,7 +30,7 @@ class OrderCard extends StatelessWidget {
               )),
           padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.all(12),
-          height: 150,
+          height: 180,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

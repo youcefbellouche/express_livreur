@@ -1,11 +1,14 @@
 // ignore_for_file: file_names
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:express_livreur/ApiFirebase.dart';
 import 'package:express_livreur/Model/Filter.dart';
 import 'package:express_livreur/Model/Order.dart';
 import 'package:express_livreur/Widget/Drawer.dart';
 import 'package:express_livreur/Widget/OrderCard.dart';
+import 'package:express_livreur/FirebasePushNotif.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -21,9 +24,26 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    FirabasePushNotif.initialize(onSelectedNotification)
+        .then((value) => fcml());
     scrollController.addListener(_scrollListener);
     saveToken();
     fetchData(time: dateTime);
+  }
+
+  void fcml() async {
+    FirabasePushNotif.onMessage
+        .listen(FirabasePushNotif.invokeLocalNotification);
+    FirabasePushNotif.onMessageOpenedApp.listen(_pageOpen);
+  }
+
+  _pageOpen(RemoteMessage remote) {
+    final Map<String, dynamic> mes = remote.data;
+    onSelectedNotification(jsonEncode(mes));
+  }
+
+  Future onSelectedNotification(String? payload) async {
+    print(payload);
   }
 
   saveToken() async {
