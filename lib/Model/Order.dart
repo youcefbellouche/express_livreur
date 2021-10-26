@@ -18,6 +18,8 @@ class Order {
   String? total;
   double? coutLivraison;
   double? coutAnnuler;
+  int? dateEnlivraison;
+  int? dateLivrer;
 
   Order(
       {this.price,
@@ -48,6 +50,8 @@ class Order {
     total = json['total'];
     coutLivraison = json['coutLivraison'];
     coutAnnuler = json['coutAnnuler'];
+    dateEnlivraison = json['dateEnlivraison'];
+    dateLivrer = json['dateLivrer'];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {};

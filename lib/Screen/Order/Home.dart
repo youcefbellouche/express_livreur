@@ -28,7 +28,7 @@ class _HomeState extends State<Home> {
         .then((value) => fcml());
     scrollController.addListener(_scrollListener);
     saveToken();
-    fetchData(time: dateTime);
+    fetchData();
   }
 
   void fcml() async {
@@ -43,6 +43,7 @@ class _HomeState extends State<Home> {
   }
 
   Future onSelectedNotification(String? payload) async {
+    // ignore: avoid_print
     print(payload);
   }
 
@@ -61,14 +62,6 @@ class _HomeState extends State<Home> {
 
   Filter? sort;
 
-  final _sortByOptions = [
-    Filter("all", "Tout", "asc"),
-    Filter("En attente", "En attente", "asc"),
-    Filter("En livraison", "En livraison", "asc"),
-    Filter("Livré", "Livré", "asc"),
-    Filter("Annuler", "Annuler", "asc"),
-  ];
-
   APIFirebase apiFirebase = APIFirebase();
 
   bool loading = true;
@@ -79,7 +72,7 @@ class _HomeState extends State<Home> {
   bool dateShow = false;
   int page = 1;
 
-  fetchData({String? status, required DateTime time}) async {
+  fetchData({String? status, DateTime? time}) async {
     data = await apiFirebase.getOrders(status: status, time: time);
     setState(() {
       loading = false;
@@ -105,8 +98,7 @@ class _HomeState extends State<Home> {
     }
   }
 
-  DateTime dateTime =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  DateTime? dateTime;
   DateRangePickerController dateController = DateRangePickerController();
 
   @override
@@ -160,13 +152,14 @@ class _HomeState extends State<Home> {
                         onSelected: (Filter sortBy) {
                           setState(() {
                             sort = sortBy;
+
                             fetchData(status: sort!.value, time: dateTime);
                             idController.clear();
                           });
                         },
                         icon: const Icon(Icons.tune),
                         itemBuilder: (BuildContext context) {
-                          return _sortByOptions.map((item) {
+                          return sortByOptions.map((item) {
                             return PopupMenuItem<Filter>(
                                 value: item, child: Text(item.text));
                           }).toList();

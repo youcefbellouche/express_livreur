@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       initialRoute: '/',
       getPages: routes,
+      debugShowCheckedModeBanner: false,
       title: 'Shopping express',
     );
   }

@@ -7,7 +7,7 @@ Drawer drawer(context) {
   return Drawer(
     child: ListView(
       children: [
-        const DrawerHeader(child: Text('Options')),
+        // const DrawerHeader(child: Text('Options')),
         DrawerItem(title: 'Acceuil', func: () => Get.offNamed('/')),
         DrawerItem(
           title: 'Statistiques',
@@ -37,7 +37,7 @@ class DrawerItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: ListTile(
-          tileColor: Colors.blueGrey.withOpacity(0.4),
+          tileColor: Colors.grey[100],
           title: Text(
             title,
             style: const TextStyle(fontSize: 25),

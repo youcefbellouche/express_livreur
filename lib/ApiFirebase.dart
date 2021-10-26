@@ -93,31 +93,53 @@ class APIFirebase {
     return data;
   }
 
-  Future<List<Order>> getOrders(
-      {String? status, required DateTime time}) async {
+  Future<List<Order>> getOrders({String? status, DateTime? time}) async {
     List<Order> data = [];
     try {
       if (status != null && status != "all") {
-        await FirebaseFirestore.instance
-            .collection('Orders')
-            .where("status", isEqualTo: status.toLowerCase())
-            .where('time', isEqualTo: time.millisecondsSinceEpoch)
-            .get()
-            .then((value) {
-          for (var element in value.docs) {
-            data.add(Order.fromJson(element.data()));
-          }
-        });
+        if (time != null) {
+          await FirebaseFirestore.instance
+              .collection('Orders')
+              .where("status", isEqualTo: status.toLowerCase())
+              .where('time', isEqualTo: time.millisecondsSinceEpoch)
+              .get()
+              .then((value) {
+            for (var element in value.docs) {
+              data.add(Order.fromJson(element.data()));
+            }
+          });
+        } else {
+          await FirebaseFirestore.instance
+              .collection('Orders')
+              .where("status", isEqualTo: status.toLowerCase())
+              .get()
+              .then((value) {
+            for (var element in value.docs) {
+              data.add(Order.fromJson(element.data()));
+            }
+          });
+        }
       } else {
-        await FirebaseFirestore.instance
-            .collection('Orders')
-            .where('time', isEqualTo: time.millisecondsSinceEpoch)
-            .get()
-            .then((value) {
-          for (var element in value.docs) {
-            data.add(Order.fromJson(element.data()));
-          }
-        });
+        if (time != null) {
+          await FirebaseFirestore.instance
+              .collection('Orders')
+              .where('time', isEqualTo: time.millisecondsSinceEpoch)
+              .get()
+              .then((value) {
+            for (var element in value.docs) {
+              data.add(Order.fromJson(element.data()));
+            }
+          });
+        } else {
+          await FirebaseFirestore.instance
+              .collection('Orders')
+              .get()
+              .then((value) {
+            for (var element in value.docs) {
+              data.add(Order.fromJson(element.data()));
+            }
+          });
+        }
       }
     } on DioError catch (e) {
       // ignore: avoid_print

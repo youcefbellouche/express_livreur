@@ -1,4 +1,5 @@
-// ignore: file_names
+// ignore_for_file: file_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -85,12 +86,12 @@ class FirabasePushNotif {
   static Future<void> _initializeLocalNotification(
     SelectNotificationCallback onSelectNotification,
   ) async {
-    final android = AndroidInitializationSettings(
+    const android = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
-    final ios = IOSInitializationSettings();
+    const ios = IOSInitializationSettings();
 
-    final initsetting = InitializationSettings(android: android, iOS: ios);
+    const initsetting = InitializationSettings(android: android, iOS: ios);
 
     await _localNotification.initialize(
       initsetting,

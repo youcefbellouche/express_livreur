@@ -91,10 +91,23 @@ class _OrderInfoState extends State<OrderInfo> {
                           label: 'Status',
                           read: true,
                           value: widget.order.status,
-                          onChanged: (input) {
-                            widget.order.status = input;
-                          },
                         ),
+                        widget.order.dateEnlivraison != null
+                            ? CustomField(
+                                label: 'Date debut livraison',
+                                read: true,
+                                value: DateTime.fromMillisecondsSinceEpoch(
+                                        widget.order.dateEnlivraison!)
+                                    .toString())
+                            : Container(),
+                        widget.order.dateLivrer != null
+                            ? CustomField(
+                                label: 'Date de livraison',
+                                read: true,
+                                value: DateTime.fromMillisecondsSinceEpoch(
+                                        widget.order.dateLivrer!)
+                                    .toString())
+                            : Container(),
                         CustomField(
                           label: 'Produit',
                           read: true,
