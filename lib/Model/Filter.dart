@@ -9,7 +9,7 @@ class Filter {
 final sortByOptions = [
   Filter("all", "Tout", "asc"),
   Filter("En attente", "En attente", "asc"),
-  Filter("En livraison", "En livraison", "asc"),
-  Filter("Livré", "Livré", "asc"),
-  Filter("Annuler", "Annuler", "asc"),
+  Filter("en livraison", "En livraison", "asc"),
+  Filter("livré", "Livré", "asc"),
+  Filter("annuler", "Annuler", "asc"),
 ];

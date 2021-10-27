@@ -41,7 +41,7 @@ class OrderCard extends StatelessWidget {
                     'id : ',
                     style: TextStyle(fontSize: 16),
                   ),
-                  SelectableText(
+                  Text(
                     data.id.toString(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
@@ -56,7 +56,7 @@ class OrderCard extends StatelessWidget {
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.5,
-                    child: SelectableText(
+                    child: Text(
                       data.user!.firstName.toString(),
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
@@ -70,7 +70,7 @@ class OrderCard extends StatelessWidget {
                     'Produit : ',
                     style: TextStyle(fontSize: 18),
                   ),
-                  SelectableText(
+                  Text(
                     data.product!.name.toString(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
@@ -83,7 +83,7 @@ class OrderCard extends StatelessWidget {
                     'Quantité : ',
                     style: TextStyle(fontSize: 18),
                   ),
-                  SelectableText(
+                  Text(
                     data.product!.quantity.toString(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
@@ -96,7 +96,7 @@ class OrderCard extends StatelessWidget {
                     'Statut : ',
                     style: TextStyle(fontSize: 18),
                   ),
-                  SelectableText(
+                  Text(
                     data.status.toString(),
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),

@@ -6,6 +6,7 @@ import 'package:express_livreur/Model/Order.dart';
 import 'package:express_livreur/Widget/Button.dart';
 import 'package:express_livreur/Widget/Field.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
@@ -25,7 +26,7 @@ class _OrderInfoState extends State<OrderInfo> {
   final formKey = GlobalKey<FormState>();
   TextEditingController noteController = TextEditingController();
   TextEditingController coutLivraison = TextEditingController();
-  TextEditingController coutAnnuler = TextEditingController(text: '0');
+  TextEditingController coutAnnuler = TextEditingController();
 
   @override
   void initState() {
@@ -202,6 +203,15 @@ class _OrderInfoState extends State<OrderInfo> {
                                 Abutton(
                                   size: const Size(150, 50),
                                   onpressed: () async {
+                                    if (widget.order.status == "en livraison" &&
+                                        coutAnnuler.text.isEmpty) {
+                                      Get.snackbar(
+                                          'Error', 'Donnez le cout du retour',
+                                          colorText: Colors.white,
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: Colors.redAccent);
+                                      return;
+                                    }
                                     bool liv =
                                         widget.order.status == 'En attente'
                                             ? false
@@ -220,8 +230,11 @@ class _OrderInfoState extends State<OrderInfo> {
                                             double.parse(coutAnnuler.text));
 
                                     liv
-                                        ? annulerStockafterLivraison()
-                                        : annulerStockafterAttente();
+                                        ? await Future.wait([
+                                            annulerStockafterLivraison(),
+                                            nonRecouvertAnnuler()
+                                          ])
+                                        : await annulerStockafterAttente();
                                     await FirebaseFirestore.instance
                                         .collection("Tokens")
                                         .doc('admin')
@@ -242,6 +255,16 @@ class _OrderInfoState extends State<OrderInfo> {
                                   size: const Size(150, 50),
                                   onpressed: () async {
                                     if (formKey.currentState!.validate()) {
+                                      if (widget.order.status ==
+                                              "en livraison" &&
+                                          coutLivraison.text.isEmpty) {
+                                        Get.snackbar('Error',
+                                            'Donnez le cout de la livraison',
+                                            colorText: Colors.white,
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.redAccent);
+                                        return;
+                                      }
                                       setState(() {
                                         loading = true;
 
@@ -291,7 +314,7 @@ class _OrderInfoState extends State<OrderInfo> {
           id: widget.order.id.toString(),
           total: double.parse(widget.order.totalRammaser!),
           coutLivraison: double.parse(coutLivraison.text));
-      await liverStock();
+      await Future.wait([nonRecouvertLivrer(), liverStock()]);
     }
     await FirebaseFirestore.instance
         .collection("Tokens")
@@ -300,6 +323,24 @@ class _OrderInfoState extends State<OrderInfo> {
         .then((value) async {
       await apiFirebase.sendMessage(value.data()!["tokens"],
           "Votre commande ${widget.order.id} est ${widget.order.status} ");
+    });
+  }
+
+  Future nonRecouvertLivrer() async {
+    double beneficie = double.parse(widget.order.totalRammaser!) -
+        double.parse(coutLivraison.text.isEmpty ? '0' : coutLivraison.text);
+    FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
+      'Benifice': FieldValue.increment(beneficie),
+      'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
+    });
+  }
+
+  Future nonRecouvertAnnuler() async {
+    double beneficie =
+        double.parse(coutAnnuler.text.isEmpty ? '0' : coutAnnuler.text);
+    FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
+      'Benifice': FieldValue.increment(-1 * beneficie),
+      'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
     });
   }
 

@@ -100,7 +100,7 @@ class APIFirebase {
         if (time != null) {
           await FirebaseFirestore.instance
               .collection('Orders')
-              .where("status", isEqualTo: status.toLowerCase())
+              .where("status", isEqualTo: status)
               .where('time', isEqualTo: time.millisecondsSinceEpoch)
               .get()
               .then((value) {
@@ -111,7 +111,7 @@ class APIFirebase {
         } else {
           await FirebaseFirestore.instance
               .collection('Orders')
-              .where("status", isEqualTo: status.toLowerCase())
+              .where("status", isEqualTo: status)
               .get()
               .then((value) {
             for (var element in value.docs) {

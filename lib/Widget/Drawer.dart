@@ -15,6 +15,19 @@ Drawer drawer(context) {
             Get.offNamed('Stats');
           },
         ),
+        DrawerItem(
+          title: 'Non recouverts',
+          func: () {
+            Get.offNamed('NonRecouvert');
+          },
+        ),
+
+        DrawerItem(
+          title: 'Recouvert',
+          func: () {
+            Get.offNamed('Recouvert');
+          },
+        ),
       ],
     ),
   );
