@@ -11,6 +11,7 @@ import 'package:express_livreur/Widget/OrderCard.dart';
 import 'package:express_livreur/FirebasePushNotif.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class Home extends StatefulWidget {
@@ -24,9 +25,11 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    FlutterAppBadger.removeBadge();
+
     FirabasePushNotif.initialize(onSelectedNotification)
         .then((value) => fcml());
-    scrollController.addListener(_scrollListener);
+
     saveToken();
     fetchData();
   }
@@ -65,15 +68,15 @@ class _HomeState extends State<Home> {
   APIFirebase apiFirebase = APIFirebase();
 
   bool loading = true;
-  final ScrollController scrollController = ScrollController();
 
   List<Order> data = [];
 
   bool dateShow = false;
   int page = 1;
 
-  fetchData({String? status, DateTime? time}) async {
-    data = await apiFirebase.getOrders(status: status, time: time);
+  fetchData({String? status, DateTime? time1, DateTime? time2}) async {
+    data =
+        await apiFirebase.getOrders(status: status, time1: time1, time2: time2);
     setState(() {
       loading = false;
     });
@@ -86,19 +89,7 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _scrollListener() async {
-    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
-        !scrollController.position.outOfRange) {
-      setState(() {
-        loading = true;
-        page++;
-      });
-
-      // await refetchData();
-    }
-  }
-
-  DateTime? dateTime;
+  PickerDateRange? dateTime;
   DateRangePickerController dateController = DateRangePickerController();
 
   @override
@@ -153,7 +144,10 @@ class _HomeState extends State<Home> {
                           setState(() {
                             sort = sortBy;
 
-                            fetchData(status: sort!.value, time: dateTime);
+                            fetchData(
+                                status: sort!.value,
+                                time1: dateTime?.startDate,
+                                time2: dateTime?.endDate);
                             idController.clear();
                           });
                         },
@@ -178,14 +172,23 @@ class _HomeState extends State<Home> {
                             onSelectionChanged:
                                 (DateRangePickerSelectionChangedArgs args) {
                               setState(() {
-                                dateTime = args.value;
-                                loading = true;
+                                dateTime = PickerDateRange(
+                                    args.value.startDate, args.value.endDate);
                               });
-                              fetchData(time: dateTime);
+                              if (args.value.startDate != null &&
+                                  args.value.endDate != null) {
+                                setState(() {
+                                  loading = true;
+                                });
+                                fetchData(
+                                    time1: dateTime?.startDate,
+                                    time2: dateTime?.endDate);
+                              }
                             },
                             controller: dateController,
                             maxDate: DateTime.now(),
                             minDate: DateTime(2021),
+                            selectionMode: DateRangePickerSelectionMode.range,
                             monthViewSettings:
                                 const DateRangePickerMonthViewSettings(
                                     firstDayOfWeek: 7),
@@ -198,7 +201,6 @@ class _HomeState extends State<Home> {
                 child: loading
                     ? const Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                        controller: scrollController,
                         scrollDirection: Axis.vertical,
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,

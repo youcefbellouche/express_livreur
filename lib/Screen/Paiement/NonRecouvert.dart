@@ -27,18 +27,17 @@ class NonRecouvert extends StatelessWidget {
                 floatingActionButton: FloatingActionButton.extended(
                     onPressed: () async {
                       if (paiement.benefice != null) {
-                        print(paiement.dateDebut);
                         await FirebaseFirestore.instance
                             .collection('Recouvert')
                             .add(paiement.toJson());
 
-                        // await FirebaseFirestore.instance
-                        //     .collection('Non-Recouvert')
-                        //     .doc('1')
-                        //     .set({
-                        //   'DateDebut': DateTime.now().millisecondsSinceEpoch,
-                        //   'payer': false
-                        // });
+                        await FirebaseFirestore.instance
+                            .collection('Non-Recouvert')
+                            .doc('1')
+                            .set({
+                          'DateDebut': DateTime.now().millisecondsSinceEpoch,
+                          'payer': false
+                        });
                       } else {
                         Get.snackbar('Error', "Y'a rien à payer",
                             colorText: Colors.white,

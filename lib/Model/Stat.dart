@@ -7,7 +7,7 @@ class Stat {
   int? time;
   double? total;
   double? coutLivraison;
-  double? coutAnnuler;
+  dynamic coutAnnuler;
   Stat(
       {this.enLivraison,
       this.annuler,

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // ignore: camel_case_types
@@ -24,7 +25,12 @@ class FirabasePushNotif {
     );
   }
 
-  static Stream<RemoteMessage> get onMessage => FirebaseMessaging.onMessage;
+  static Stream<RemoteMessage> get onMessage {
+    FlutterAppBadger.updateBadgeCount(1);
+
+    return FirebaseMessaging.onMessage;
+  }
+
   static Stream<RemoteMessage> get onMessageOpenedApp =>
       FirebaseMessaging.onMessageOpenedApp;
 
@@ -41,9 +47,10 @@ class FirabasePushNotif {
   }
 
   static void invokeLocalNotification(RemoteMessage remoteMessage) async {
+    FlutterAppBadger.updateBadgeCount(1);
+
     RemoteNotification? notification = remoteMessage.notification;
     AndroidNotification? android = remoteMessage.notification?.android;
-
     if (notification != null && android != null) {
       await _localNotification.show(
         notification.hashCode,
@@ -51,10 +58,13 @@ class FirabasePushNotif {
         notification.body,
         NotificationDetails(
           android: AndroidNotificationDetails(
-            'Rev', // id
-            'Express Livreur', // title
-            icon: android.smallIcon,
-          ),
+              'Rev', // id
+              'Express Livreur', // title
+              icon: android.smallIcon,
+              sound: const RawResourceAndroidNotificationSound('key_sound'),
+              importance: Importance.max,
+              playSound: true,
+              priority: Priority.max),
         ),
         payload: jsonEncode(remoteMessage.data),
       );
@@ -63,10 +73,11 @@ class FirabasePushNotif {
 
   static Future<void> _configureAndroidChannel() async {
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'BreakingCodeChannel', // id
-      'High Importance Notifications', // title/ description
-      importance: Importance.max,
-    );
+        'Rev', // id
+        'Express Livreur', // title/ description
+        importance: Importance.max,
+        sound: RawResourceAndroidNotificationSound('key_sound'),
+        playSound: true);
 
     await _localNotification
         .resolvePlatformSpecificImplementation<

@@ -6,6 +6,7 @@ import 'package:express_livreur/Model/Order.dart';
 import 'package:express_livreur/Widget/Button.dart';
 import 'package:express_livreur/Widget/Field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -44,6 +45,19 @@ class _OrderInfoState extends State<OrderInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          String orderCopy =
+              '${widget.order.user?.firstName} \n ${widget.order.user?.phone} \n ${widget.order.user?.state} \n ${widget.order.user?.city} \n ${widget.order.user?.address} \n ${widget.order.product?.name}  \n ${widget.order.product?.quantity}  \n ${widget.order.totalRammaser}';
+          Clipboard.setData(ClipboardData(text: orderCopy)).whenComplete(() =>
+              Get.snackbar('Copier', 'Information copier avec succes',
+                  colorText: Colors.white,
+                  snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: Colors.green));
+        },
+        label: const Text('Copier'),
+        icon: const Icon(Icons.copy),
+      ),
       appBar: AppBar(
         title: const Text('Shoping express'),
       ),
@@ -194,7 +208,7 @@ class _OrderInfoState extends State<OrderInfo> {
                   widget.order.status == 'En attente' ||
                           widget.order.status == 'en livraison'
                       ? SliverPadding(
-                          padding: const EdgeInsets.only(bottom: 24),
+                          padding: const EdgeInsets.only(bottom: 80),
                           sliver: SliverToBoxAdapter(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.end,

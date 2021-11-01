@@ -24,6 +24,7 @@ class APIFirebase {
           'notification': <String, dynamic>{
             "title": 'Express Shopping',
             "body": message,
+            'sound': 'key_sound'
           },
           'priority': 'high',
           'data': <String, dynamic>{
@@ -93,15 +94,18 @@ class APIFirebase {
     return data;
   }
 
-  Future<List<Order>> getOrders({String? status, DateTime? time}) async {
+  Future<List<Order>> getOrders(
+      {String? status, DateTime? time1, DateTime? time2}) async {
     List<Order> data = [];
     try {
       if (status != null && status != "all") {
-        if (time != null) {
+        if (time1 != null && time2 != null) {
           await FirebaseFirestore.instance
               .collection('Orders')
               .where("status", isEqualTo: status)
-              .where('time', isEqualTo: time.millisecondsSinceEpoch)
+              .where('time',
+                  isGreaterThanOrEqualTo: time1.millisecondsSinceEpoch)
+              .where('time', isLessThanOrEqualTo: time2.millisecondsSinceEpoch)
               .get()
               .then((value) {
             for (var element in value.docs) {
@@ -120,10 +124,12 @@ class APIFirebase {
           });
         }
       } else {
-        if (time != null) {
+        if (time1 != null && time2 != null) {
           await FirebaseFirestore.instance
               .collection('Orders')
-              .where('time', isEqualTo: time.millisecondsSinceEpoch)
+              .where('time',
+                  isGreaterThanOrEqualTo: time1.millisecondsSinceEpoch)
+              .where('time', isLessThanOrEqualTo: time2.millisecondsSinceEpoch)
               .get()
               .then((value) {
             for (var element in value.docs) {
