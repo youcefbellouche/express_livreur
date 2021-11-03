@@ -20,10 +20,12 @@ class Order {
   double? coutAnnuler;
   int? dateEnlivraison;
   int? dateLivrer;
+  String? raisonAnnuler;
 
   Order(
       {this.price,
       this.id,
+      this.raisonAnnuler,
       this.dateCreated,
       this.user,
       this.product,
@@ -50,6 +52,7 @@ class Order {
     total = json['total'];
     coutLivraison = json['coutLivraison'];
     coutAnnuler = json['coutAnnuler'];
+    raisonAnnuler = json['raisonAnnuler'];
     dateEnlivraison = json['dateEnlivraison'];
     dateLivrer = json['dateLivrer'];
   }

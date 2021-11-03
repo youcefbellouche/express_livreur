@@ -28,6 +28,7 @@ class _OrderInfoState extends State<OrderInfo> {
   TextEditingController noteController = TextEditingController();
   TextEditingController coutLivraison = TextEditingController();
   TextEditingController coutAnnuler = TextEditingController();
+  TextEditingController raisonAnnuler = TextEditingController();
 
   @override
   void initState() {
@@ -205,6 +206,16 @@ class _OrderInfoState extends State<OrderInfo> {
                           )
                         : Container(),
                   ),
+                  SliverToBoxAdapter(
+                    child: widget.order.status == 'en livraison'
+                        ? CustomField(
+                            label: "Raison du retour",
+                            read: false,
+                            controller: raisonAnnuler,
+                            textInputType: TextInputType.number,
+                          )
+                        : Container(),
+                  ),
                   widget.order.status == 'En attente' ||
                           widget.order.status == 'en livraison'
                       ? SliverPadding(
@@ -218,9 +229,11 @@ class _OrderInfoState extends State<OrderInfo> {
                                   size: const Size(150, 50),
                                   onpressed: () async {
                                     if (widget.order.status == "en livraison" &&
-                                        coutAnnuler.text.isEmpty) {
-                                      Get.snackbar(
-                                          'Error', 'Donnez le cout du retour',
+                                        coutAnnuler.text.isEmpty &&
+                                        raisonAnnuler.text.isEmpty &&
+                                        double.parse(coutAnnuler.text) < 0) {
+                                      Get.snackbar('Error',
+                                          'Donnez le cout et la raison du retour',
                                           colorText: Colors.white,
                                           snackPosition: SnackPosition.BOTTOM,
                                           backgroundColor: Colors.redAccent);
@@ -236,6 +249,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                     });
 
                                     await apiFirebase.updateOrder(
+                                        raisonAnnuler: raisonAnnuler.text,
                                         status: widget.order.status!,
                                         total: double.parse(
                                             widget.order.totalRammaser!),
@@ -344,7 +358,7 @@ class _OrderInfoState extends State<OrderInfo> {
     double beneficie = double.parse(widget.order.totalRammaser!) -
         double.parse(coutLivraison.text.isEmpty ? '0' : coutLivraison.text);
     FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
-      'Benifice': FieldValue.increment(beneficie),
+      'Benefice': FieldValue.increment(beneficie),
       'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
     });
   }
@@ -353,7 +367,7 @@ class _OrderInfoState extends State<OrderInfo> {
     double beneficie =
         double.parse(coutAnnuler.text.isEmpty ? '0' : coutAnnuler.text);
     FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
-      'Benifice': FieldValue.increment(-1 * beneficie),
+      'Benefice': FieldValue.increment(-1 * beneficie),
       'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
     });
   }

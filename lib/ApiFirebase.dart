@@ -157,6 +157,7 @@ class APIFirebase {
   Future updateOrder(
       {required String status,
       required String id,
+      String? raisonAnnuler,
       double? total,
       double? coutLivraison,
       double? coutAnnuler}) async {
@@ -181,6 +182,7 @@ class APIFirebase {
       if (status == 'annuler') {
         await FirebaseFirestore.instance.collection('Orders').doc(id).update({
           "status": status,
+          'raisonAnnuler': raisonAnnuler,
           'coutAnnuler': coutAnnuler,
           'dateAnnuler': DateTime.now().millisecondsSinceEpoch
         });
