@@ -49,7 +49,7 @@ class _OrderInfoState extends State<OrderInfo> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           String orderCopy =
-              '${widget.order.user?.firstName} \n ${widget.order.user?.phone} \n ${widget.order.user?.state} \n ${widget.order.user?.city} \n ${widget.order.user?.address} \n ${widget.order.product?.name}  \n ${widget.order.product?.quantity}  \n ${widget.order.totalRammaser}';
+              '${widget.order.user?.firstName} \n ${widget.order.user?.phone} \n ${widget.order.user?.state} \n ${widget.order.user?.city} \n ${widget.order.user?.address} \n ${widget.order.product?.name}  \n ${widget.order.product?.quantity}  \n ${widget.order.totalRammaser} \n  ${widget.order.variable}';
           Clipboard.setData(ClipboardData(text: orderCopy)).whenComplete(() =>
               Get.snackbar('Copier', 'Information copier avec succes',
                   colorText: Colors.white,
@@ -212,7 +212,7 @@ class _OrderInfoState extends State<OrderInfo> {
                             label: "Raison du retour",
                             read: false,
                             controller: raisonAnnuler,
-                            textInputType: TextInputType.number,
+                            textInputType: TextInputType.text,
                           )
                         : Container(),
                   ),

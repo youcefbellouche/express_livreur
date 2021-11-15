@@ -2,9 +2,9 @@
 
 class Paiement {
   List<dynamic>? commandes;
-  int? benefice;
-  int? dateDebut;
-  int? dateFin;
+  dynamic benefice;
+  dynamic dateDebut;
+  dynamic dateFin;
   bool? payer;
   Paiement(
       {this.benefice,
@@ -14,7 +14,7 @@ class Paiement {
       this.payer});
   Paiement.fromJson(Map<String, dynamic> json) {
     commandes = json['commandes'];
-    benefice = json['Benefice'];
+    benefice = json['Benifice'];
     dateDebut = json['DateDebut'];
     dateFin = json['DateFin'];
     payer = json['payer'];
@@ -23,7 +23,7 @@ class Paiement {
     final Map<String, dynamic> data = {};
     data['payer'] = payer;
     data['commandes'] = commandes;
-    data['Benefice'] = benefice;
+    data['Benifice'] = benefice;
     data['DateDebut'] = dateDebut;
     data['DateFin'] = DateTime.now().millisecondsSinceEpoch;
     data['payer'] = true;

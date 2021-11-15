@@ -116,6 +116,7 @@ class APIFirebase {
           await FirebaseFirestore.instance
               .collection('Orders')
               .where("status", isEqualTo: status)
+              .orderBy('id', descending: true)
               .get()
               .then((value) {
             for (var element in value.docs) {
@@ -130,6 +131,7 @@ class APIFirebase {
               .where('time',
                   isGreaterThanOrEqualTo: time1.millisecondsSinceEpoch)
               .where('time', isLessThanOrEqualTo: time2.millisecondsSinceEpoch)
+              .orderBy('time', descending: true)
               .get()
               .then((value) {
             for (var element in value.docs) {
@@ -139,6 +141,7 @@ class APIFirebase {
         } else {
           await FirebaseFirestore.instance
               .collection('Orders')
+              .orderBy('id', descending: true)
               .get()
               .then((value) {
             for (var element in value.docs) {
