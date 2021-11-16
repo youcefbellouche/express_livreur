@@ -1,6 +1,5 @@
 // ignore_for_file: file_names
 
-import 'Meta.dart';
 import 'Product.dart';
 import 'User.dart';
 
@@ -11,7 +10,7 @@ class Order {
   String? price;
   User? user;
   Product? product;
-  Meta_data? meta;
+
   String? totalRammaser;
   String? note;
   String? status;
@@ -29,7 +28,6 @@ class Order {
       this.dateCreated,
       this.user,
       this.product,
-      this.meta,
       this.totalRammaser,
       this.note,
       this.variable,
@@ -45,7 +43,7 @@ class Order {
     totalRammaser = json['totalRammaser'];
     user = User.fromJson(json["user"]);
     product = Product.fromJson(json["products"]);
-    meta = Meta_data.fromJson(json["meta"]);
+
     variable = json['color'];
     status = json['status'];
     note = json['note'];
@@ -67,9 +65,7 @@ class Order {
     if (user != null) {
       data['user'] = user!.toJson();
     }
-    if (meta != null) {
-      data['meta'] = meta!.toJson();
-    }
+
     if (product != null) {
       data['products'] = product!.toJson();
     }
