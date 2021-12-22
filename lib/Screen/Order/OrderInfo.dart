@@ -358,7 +358,7 @@ class _OrderInfoState extends State<OrderInfo> {
     double beneficie = double.parse(widget.order.totalRammaser!) -
         double.parse(coutLivraison.text.isEmpty ? '0' : coutLivraison.text);
     FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
-      'Benefice': FieldValue.increment(beneficie),
+      'Benifice': FieldValue.increment(beneficie),
       'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
     });
   }
@@ -367,7 +367,7 @@ class _OrderInfoState extends State<OrderInfo> {
     double beneficie =
         double.parse(coutAnnuler.text.isEmpty ? '0' : coutAnnuler.text);
     FirebaseFirestore.instance.collection('Non-Recouvert').doc('1').update({
-      'Benefice': FieldValue.increment(-1 * beneficie),
+      'Benifice': FieldValue.increment(-1 * beneficie),
       'commandes': FieldValue.arrayUnion([widget.order.id.toString()])
     });
   }
